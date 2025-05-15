@@ -3,7 +3,7 @@ kind: AtlasProject
 metadata:
   name: my-project
   labels:
-    environment: development
+    environment: staging
 spec:
   name: Test Atlas Operator Project
   projectIpAccessList:
