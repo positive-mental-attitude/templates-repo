@@ -3,8 +3,6 @@ kind: Application
 metadata:
   name: atlas-resources
   namespace: argocd 
-  labels:
-    environment: development
 spec:
   project: default
   source:
