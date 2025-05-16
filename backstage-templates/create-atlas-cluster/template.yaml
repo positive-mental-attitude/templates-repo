@@ -93,7 +93,7 @@ spec:
 
     - id: template-crd
       name: Template the AtlasDeployment CRD
-      action: legacy:template # Use 'legacy:template' if `builtin:template` isn't available or for older versions
+      action: scaffolder:template # Use 'legacy:template' if `builtin:template` isn't available or for older versions
       input:
         values:
           # Parameters defined above are automatically available to the templating engine
