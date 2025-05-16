@@ -73,9 +73,9 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
-            requestUserCredentials:
-              secretsKey: GITHUB_TOKEN # Ensure this matches your app-config.yaml for GitHub integration
-          default: 'https://github.com/positive-mental-attitude/templates-repo.git' # Your repo
+            # requestUserCredentials:
+              # secretsKey: GITHUB_TOKEN # Ensure this matches your app-config.yaml for GitHub integration
+          # default: 'https://github.com/positive-mental-attitude/templates-repo.git' # Your repo
 
   # Define the steps the scaffolder will execute
   steps:
