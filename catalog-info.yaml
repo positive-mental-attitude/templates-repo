@@ -1,0 +1,7 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: backstage-software-templates
+spec:
+  targets:
+    - ./backstage-templates/create-atlas-cluster/template.yaml
