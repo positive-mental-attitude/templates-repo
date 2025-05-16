@@ -1,0 +1,132 @@
+# /backstage-templates/create-atlas-cluster/template.yaml
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-mongodb-atlas-cluster
+  title: Create MongoDB Atlas Cluster
+  description: Provisions a new MongoDB Atlas cluster via Kubernetes Operator and ArgoCD.
+  tags:
+    - mongodb
+    - atlas
+    - database
+spec:
+  owner: platform-team@example.com # Your platform team's email or group
+  type: service # Or 'resource', 'website', etc.
+
+  # Define parameters for the user input form
+  parameters:
+    - title: Cluster Configuration
+      required:
+        - clusterName
+        - atlasProjectName
+        - environment
+        - providerName
+        - regionName
+        - instanceSizeName
+      properties:
+        clusterName:
+          title: Cluster Name
+          type: string
+          description: Unique name for the MongoDB Atlas cluster (e.g., my-app-user-db).
+          ui:autofocus: true
+          # Add pattern validation if needed
+        atlasProjectName:
+          title: Existing Atlas Project Name (Kubernetes CR Name)
+          type: string
+          description: The 'metadata.name' of an existing AtlasProject CR (e.g., my-atlas-project).
+        environment:
+          title: Environment
+          type: string
+          description: The deployment environment.
+          enum:
+            - development
+            - staging
+            - production
+          default: development
+        providerName:
+          title: Cloud Provider
+          type: string
+          description: Cloud provider for the cluster.
+          enum:
+            - AWS
+            - GCP
+            - AZURE
+          default: GCP
+        regionName:
+          title: Region
+          type: string
+          description: Cloud provider region (e.g., US_EAST_1 for AWS, us-east1 for GCP).
+          # You might want to make this dynamic based on providerName using conditional logic or separate templates.
+        instanceSizeName:
+          title: Instance Size
+          type: string
+          description: Atlas cluster tier (e.g., M10, M20, M30).
+          default: M10
+    - title: Repository Information
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Target GitHub Repository URL for CRD
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+            requestUserCredentials:
+              secretsKey: GITHUB_TOKEN # Ensure this matches your app-config.yaml for GitHub integration
+          default: 'https://github.com/positive-mental-attitude/templates-repo.git' # Your repo
+
+  # Define the steps the scaffolder will execute
+  steps:
+    - id: fetch-skeleton
+      name: Fetch AtlasDeployment Skeleton
+      action: fetch:plain # Fetches plain files, not a template to be "copied"
+      input:
+        url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml.
+        targetPath: ./crd-generated # Temporary path to store fetched skeleton. The file will be at ./crd-generated/atlas-deployment-skeleton.yaml
+
+    - id: template-crd
+      name: Template the AtlasDeployment CRD
+      action: builtin:template # Use 'legacy:template' if `builtin:template` isn't available or for older versions
+      input:
+        values:
+          # Parameters defined above are automatically available to the templating engine
+          # user is also available: ${{ user.entity.metadata.name }}
+          clusterName: ${{ parameters.clusterName }}
+          atlasProjectName: ${{ parameters.atlasProjectName }}
+          environment: ${{ parameters.environment }}
+          providerName: ${{ parameters.providerName }}
+          regionName: ${{ parameters.regionName }}
+          instanceSizeName: ${{ parameters.instanceSizeName }}
+          # Example of accessing user info if needed in the skeleton:
+          # owner: ${{ user.entity.metadata.name }}
+        template: ./crd-generated/atlas-deployment-skeleton.yaml # Path to the skeleton fetched and placed in the previous step
+        outputPath: ./crd-generated/${{ parameters.clusterName }}-deployment.yaml # Output path for the processed CRD
+
+    - id: publish-to-github
+      name: Publish CRD to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: 'Publishing AtlasDeployment CRD for ${{ parameters.clusterName }}'
+        repoUrl: ${{ parameters.repoUrl }} # e.g., github.com?repo=templates-repo&owner=positive-mental-attitude
+        branch: main # Or your default branch
+        filePath: atlas-crds/${{ parameters.clusterName }}-deployment.yaml # Path within the target repo
+        sourcePath: ./crd-generated/${{ parameters.clusterName }}-deployment.yaml # Path to the file generated in the 'template-crd' step
+        commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterName }} via Backstage'
+        # Optional: gitAuthorName and gitAuthorEmail if needed, otherwise uses Backstage app's identity
+        # defaultAuthor:
+        #   name: ${{ user.entity.metadata.name }}
+        #   email: ${{ user.entity.spec.profile.email }}
+
+    - id: log-output
+      name: Log Output Paths
+      action: debug:log
+      input:
+        message: "CRD generated at ${{ steps['template-crd'].output.outputPath }} and published to ${{ steps['publish-to-github'].output.remoteUrl }}"
+
+  # Output parameters that can be displayed to the user after completion
+  output:
+    githubUrl: ${{ steps['publish-to-github'].output.remoteUrl }}
+    crdFilePath: atlas-crds/${{ parameters.clusterName }}-deployment.yaml
