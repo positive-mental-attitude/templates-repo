@@ -18,5 +18,5 @@ spec:
               instanceSize: M10
               nodeCount: 3
             providerName: AWS
-            regionName: AP_SOUTHEAST_1
+            regionName: US_EAST_1
             priority: 7
