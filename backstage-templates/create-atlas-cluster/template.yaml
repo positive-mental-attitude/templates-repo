@@ -79,6 +79,11 @@ spec:
 
   # Define the steps the scaffolder will execute
   steps:
+    - id: debug-repo-url # ADDED DEBUG STEP
+      name: Debug Repository URL
+      action: debug:log
+      input:
+        message: "Selected Repository URL by RepoUrlPicker is ${{ parameters.repoUrl }}"  
     - id: fetch-skeleton
       name: Fetch AtlasDeployment Skeleton
       action: fetch:plain # Fetches plain files, not a template to be "copied"
