@@ -4,14 +4,14 @@ kind: Template
 metadata:
   name: create-mongodb-atlas-cluster
   title: Create MongoDB Atlas Cluster
-  description: Provisions a new MongoDB Atlas cluster.
+  description: Provisions a new MongoDB Atlas cluster by creating a new config repo and a PR to the main ArgoCD repo.
 spec:
   owner: platform-team@example.com
   type: service
   parameters:
     - title: Cluster Configuration
       required:
-        - clusterName
+        - clusterName # This will be used for K8s CR name and new repo suffix
         - atlasProjectNameK8s
         - clusterNameInAtlas
         - environment
@@ -20,9 +20,10 @@ spec:
         - instanceSizeName
       properties:
         clusterName:
-          title: Kubernetes Cluster CR Name
+          title: Cluster Identifier (for K8s CR & New Repo)
           type: string
-          description: Unique name for the AtlasDeployment Kubernetes resource (e.g., my-app-user-db).
+          description: Unique identifier for the cluster (e.g., my-app-user-db). Used for K8s CR name and new repo suffix.
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' # Example: lowercase alphanumeric with hyphens
         atlasProjectNameK8s:
           title: Target AtlasProject Kubernetes Name
           type: string
@@ -54,14 +55,14 @@ spec:
           default: M10
 
   steps:
-    - id: fetch-and-template
+    - id: fetch-and-template-crd
       name: Fetch Skeleton and Template CRD
       action: fetch:template
       input:
         url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml
-        targetPath: ${{ parameters.clusterName }}.yaml # Output file name in the root of the workspace
+        targetPath: ${{ parameters.clusterName }}-deployment.yaml # Output file name in the root of the workspace
         values:
-          clusterName: ${{ parameters.clusterName }}
+          clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
           atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
           clusterNameInAtlas: ${{ parameters.clusterNameInAtlas }}
           environment: ${{ parameters.environment }}
@@ -69,18 +70,49 @@ spec:
           regionName: ${{ parameters.regionName }}
           instanceSizeName: ${{ parameters.instanceSizeName }}
 
-    - id: publish-to-github
-      name: Publish CRD to GitHub
+    - id: publish-new-config-repo
+      name: Create New GitHub Repo for Cluster Config
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: 'Publishing AtlasDeployment CRD for ${{ parameters.clusterName }}'
-        repoUrl: 'github.com?owner=positive-mental-attitude&repo=templates-repo'
-        branch: main
-        filePath: atlas-crds/${{ parameters.clusterName }}.yaml 
-        sourcePath: ${{ parameters.clusterName }}.yaml 
-        commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterName }} via Backstage'
+        description: 'Configuration repository for Atlas cluster: ${{ parameters.clusterNameInAtlas }}'
+        # Creates a new repository like 'positive-mental-attitude/my-app-user-db-config'
+        repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterName }}-config'
+        # repoVisibility: 'private' # Or 'public'
+        commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}'
+        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # Commit the generated CRD to the root of this new repo
+
+    - id: create-pr-to-argocd-repo
+      name: Create Pull Request to ArgoCD Watched Repo
+      action: publish:github:pull-request
+      input:
+        repoUrl: 'github.com?owner=positive-mental-attitude&repo=templates-repo' # Your main ArgoCD-watched repo
+        branchName: feat/add-cluster-${{ parameters.clusterName }} # Branch for the PR in templates-repo
+        title: 'feat: Request to add Atlas cluster - ${{ parameters.clusterNameInAtlas }}'
+        description: |
+          Please review and merge this Pull Request to add the AtlasDeployment CRD for cluster:
+          - Kubernetes CR Name: `${{ parameters.clusterName }}`
+          - Atlas UI Name: `${{ parameters.clusterNameInAtlas }}`
+          - Environment: `${{ parameters.environment }}`
+          - Target Atlas Project (K8s Name): `${{ parameters.atlasProjectNameK8s }}`
+
+          This CRD will be deployed to the `/atlas-crds/` directory.
+          The full configuration is also available in its dedicated repository: ${{ steps['publish-new-config-repo'].output.remoteUrl }}
+        # The content for the PR comes from the workspace.
+        # We need to ensure the file we want to PR is correctly placed for this action.
+        # The `publish:github:pull-request` action typically takes the content of the entire workspace
+        # or a specified sub-directory and proposes it as changes to the target repo.
+        # Here, we want to commit the single generated CRD file into a specific directory.
+        # For this, we need to ensure the sourcePath for the PR content is correct.
+        # The file `${{ parameters.clusterName }}.yaml` is already in the workspace root from the previous step.
+        # We'll define its target path in the PR.
+        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # The generated CRD from 'fetch-and-template-crd' step
+        targetPath: atlas-crds/${{ parameters.clusterName }}.yaml # Where this file should go in the PR to templates-repo
+        # commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}' # Optional, action generates one
+
   output:
     links:
-      - title: View CRD in Repository
-        url: https://github.com/positive-mental-attitude/templates-repo/blob/main/atlas-crds/${{ parameters.clusterName }}.yaml
+      - title: View New Config Repository
+        url: ${{ steps['publish-new-config-repo'].output.remoteUrl }}
+      - title: View Pull Request
+        url: ${{ steps['create-pr-to-argocd-repo'].output.remoteUrl }}
