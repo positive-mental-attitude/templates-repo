@@ -1,0 +1,18 @@
+# /backstage-templates/atlas-cluster/skeleton/atlas-deployment-skeleton.yaml
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasDeployment
+metadata:
+  name: 
+  namespace: mongodb-atlas-operator # Or make this a parameter
+  labels:
+    environment: 
+    owner: 
+spec:
+  projectName:  # Assumes project already exists
+  deploymentSpec:
+    name: 
+    providerSettings:
+      instanceSizeName:  # e.g., M10, M20
+      providerName:  # e.g., AWS, GCP, AZURE
+      regionName: 
+  # Add other necessary spec fields like backup, BI connector, etc.

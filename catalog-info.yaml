@@ -1,7 +1,12 @@
+# /backstage-templates/atlas-cluster-skeleton/catalog-info.yaml
 apiVersion: backstage.io/v1alpha1
-kind: Location
+kind: Component
 metadata:
-  name: backstage-software-templates
+  name: -config # Templated
+  description: Atlas cluster configuration for backstage # Templated
+  annotations:
+    github.com/project-slug: positive-mental-attitude/-config # Templated
 spec:
-  targets:
-    - ./backstage-templates/create-atlas-cluster/template.yaml
+  type: service-configuration
+  lifecycle: development # Templated
+  # owner:  # Removed owner
