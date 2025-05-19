@@ -60,7 +60,7 @@ spec:
       action: fetch:template
       input:
         url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml
-        targetPath: ${{ parameters.clusterName }}-deployment.yaml # Output file name in the root of the workspace
+        # targetPath: ${{ parameters.clusterName }}-deployment.yaml # Output file name in the root of the workspace
         values:
           clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
           atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
@@ -80,7 +80,7 @@ spec:
         repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterName }}-config'
         # repoVisibility: 'private' # Or 'public'
         commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}'
-        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # Commit the generated CRD to the root of this new repo
+        # sourcePath: ${{ parameters.clusterName }}-deployment.yaml # Commit the generated CRD to the root of this new repo
 
     - id: create-pr-to-argocd-repo
       name: Create Pull Request to ArgoCD Watched Repo
@@ -106,8 +106,8 @@ spec:
         # For this, we need to ensure the sourcePath for the PR content is correct.
         # The file `${{ parameters.clusterName }}.yaml` is already in the workspace root from the previous step.
         # We'll define its target path in the PR.
-        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # The generated CRD from 'fetch-and-template-crd' step
-        targetPath: atlas-crds/${{ parameters.clusterName }}.yaml # Where this file should go in the PR to templates-repo
+        # sourcePath: ${{ parameters.clusterName }}-deployment.yaml # The generated CRD from 'fetch-and-template-crd' step
+        # targetPath: atlas-crds/${{ parameters.clusterName }}.yaml # Where this file should go in the PR to templates-repo
         # commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}' # Optional, action generates one
 
   output:
