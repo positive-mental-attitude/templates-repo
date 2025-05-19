@@ -60,7 +60,7 @@ spec:
       action: fetch:template
       input:
         url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml
-        targetPath: ${{ parameters.clusterName }}-deployment.yaml # Output file name in the root of the workspace
+        targetPath: content/${{ parameters.atlasProjectNameK8s }}-deployment.yaml # Output file name in the root of the workspace
         values:
           clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
           atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
@@ -75,24 +75,24 @@ spec:
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: 'Configuration repository for Atlas cluster: ${{ parameters.clusterNameInAtlas }}'
+        description: 'Configuration repository for Atlas cluster: ${{ parameters.atlasProjectNameK8s }}'
         # Creates a new repository like 'positive-mental-attitude/my-app-user-db-config'
-        repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterName }}-config'
-        # repoVisibility: 'private' # Or 'public'
-        commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}'
-        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # Commit the generated CRD to the root of this new repo
+        repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.atlasProjectNameK8s }}-config'
+        repoVisibility: 'public'
+        commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.atlasProjectNameK8s }}'
+        sourcePath: content # Commit the generated CRD to the root of this new repo
 
     - id: create-pr-to-argocd-repo
       name: Create Pull Request to ArgoCD Watched Repo
       action: publish:github:pull-request
       input:
         repoUrl: 'github.com?owner=positive-mental-attitude&repo=templates-repo' # Your main ArgoCD-watched repo
-        branchName: feat/add-cluster-${{ parameters.clusterName }} # Branch for the PR in templates-repo
-        title: 'feat: Request to add Atlas cluster - ${{ parameters.clusterNameInAtlas }}'
+        branchName: feat/add-cluster-${{ parameters.atlasProjectNameK8s }} # Branch for the PR in templates-repo
+        title: 'feat: Request to add Atlas cluster - ${{ parameters.atlasProjectNameK8s }}'
         description: |
           Please review and merge this Pull Request to add the AtlasDeployment CRD for cluster:
           - Kubernetes CR Name: `${{ parameters.clusterName }}`
-          - Atlas UI Name: `${{ parameters.clusterNameInAtlas }}`
+          - Atlas UI Name: `${{ parameters.atlasProjectNameK8s }}`
           - Environment: `${{ parameters.environment }}`
           - Target Atlas Project (K8s Name): `${{ parameters.atlasProjectNameK8s }}`
 
@@ -106,8 +106,8 @@ spec:
         # For this, we need to ensure the sourcePath for the PR content is correct.
         # The file `${{ parameters.clusterName }}.yaml` is already in the workspace root from the previous step.
         # We'll define its target path in the PR.
-        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # The generated CRD from 'fetch-and-template-crd' step
-        targetPath: atlas-crds/${{ parameters.clusterName }}.yaml # Where this file should go in the PR to templates-repo
+        sourcePath: content/${{ parameters.atlasProjectNameK8s }}-deployment.yaml # The generated CRD from 'fetch-and-template-crd' step
+        targetPath: atlas-crds/${{ parameters.atlasProjectNameK8s }}.yaml # Where this file should go in the PR to templates-repo
         # commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}' # Optional, action generates one
 
   output:
