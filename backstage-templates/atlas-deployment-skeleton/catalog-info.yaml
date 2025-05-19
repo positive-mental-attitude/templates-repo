@@ -2,10 +2,10 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ values.clusterNameK8s }}-config # Templated
+  name: ${{ values.clusterNameInAtlas }}-config # Templated
   description: Atlas cluster configuration for ${{ values.clusterNameInAtlas }} # Templated
   annotations:
-    github.com/project-slug: positive-mental-attitude/${{ values.clusterNameK8s }}-config # Templated
+    github.com/project-slug: positive-mental-attitude/${{ values.clusterNameInAtlas }}-config # Templated
 spec:
   type: service-configuration
   lifecycle: ${{ values.environment }} # Templated

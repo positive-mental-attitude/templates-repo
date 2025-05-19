@@ -2,17 +2,17 @@
 apiVersion: atlas.mongodb.com/v1
 kind: AtlasDeployment
 metadata:
-  name: ${{ parameters.clusterName }}
+  name: ${{ values.clusterName }}
   namespace: mongodb-atlas-operator # Or make this a parameter
   labels:
-    environment: ${{ parameters.environment }}
-    owner: ${{ user.entity.metadata.name }}
+    environment: ${{ values.environment }}
+    # owner: ${{ user.entity.metadata.name }}
 spec:
-  projectName: ${{ parameters.atlasProjectName }} # Assumes project already exists
+  projectName: ${{ values.atlasProjectName }} # Assumes project already exists
   deploymentSpec:
-    name: ${{ parameters.clusterName }}
+    name: ${{ values.clusterNameInAtlas }}
     providerSettings:
-      instanceSizeName: ${{ parameters.instanceSizeName }} # e.g., M10, M20
-      providerName: ${{ parameters.providerName }} # e.g., AWS, GCP, AZURE
-      regionName: ${{ parameters.regionName }}
+      instanceSizeName: ${{ values.instanceSizeName }} # e.g., M10, M20
+      providerName: ${{ values.providerName }} # e.g., AWS, GCP, AZURE
+      regionName: ${{ values.regionName }}
   # Add other necessary spec fields like backup, BI connector, etc.

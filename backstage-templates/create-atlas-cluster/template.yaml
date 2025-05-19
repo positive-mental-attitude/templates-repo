@@ -77,7 +77,7 @@ spec:
         allowedHosts: ['github.com']
         description: 'Configuration repository for Atlas cluster: ${{ parameters.clusterNameInAtlas }}'
         # Creates a new repository like 'positive-mental-attitude/my-app-user-db-config'
-        repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterName }}-config'
+        repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterNameInAtlas }}-config'
         # repoVisibility: 'private' # Or 'public'
         commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}'
         # sourcePath: ${{ parameters.clusterName }}-deployment.yaml # Commit the generated CRD to the root of this new repo
@@ -87,7 +87,7 @@ spec:
       action: publish:github:pull-request
       input:
         repoUrl: 'github.com?owner=positive-mental-attitude&repo=templates-repo' # Your main ArgoCD-watched repo
-        branchName: feat/add-cluster-${{ parameters.clusterName }} # Branch for the PR in templates-repo
+        branchName: feat/add-cluster-${{ parameters.clusterNameInAtlas }} # Branch for the PR in templates-repo
         title: 'feat: Request to add Atlas cluster - ${{ parameters.clusterNameInAtlas }}'
         description: |
           Please review and merge this Pull Request to add the AtlasDeployment CRD for cluster:
