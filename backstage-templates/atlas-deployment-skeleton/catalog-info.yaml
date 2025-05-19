@@ -1,0 +1,12 @@
+# /backstage-templates/atlas-cluster-skeleton/catalog-info.yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.clusterNameK8s }}-config # Templated
+  description: Atlas cluster configuration for ${{ values.clusterNameInAtlas }} # Templated
+  annotations:
+    github.com/project-slug: positive-mental-attitude/${{ values.clusterNameK8s }}-config # Templated
+spec:
+  type: service-configuration
+  lifecycle: ${{ values.environment }} # Templated
+  # owner: ${{ values.owner | dump }} # Removed owner

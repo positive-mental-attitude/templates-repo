@@ -59,7 +59,7 @@ spec:
       name: Fetch Skeleton and Template CRD
       action: fetch:template
       input:
-        url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml
+        url: ../atlas-deployment-skeleton # Path to the skeleton file, relative to this template.yaml
         # targetPath: ${{ parameters.clusterName }}-deployment.yaml # Output file name in the root of the workspace
         values:
           clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
