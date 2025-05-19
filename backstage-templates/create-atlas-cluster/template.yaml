@@ -60,7 +60,8 @@ spec:
       action: fetch:template
       input:
         url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml
-        targetPath: ${{ parameters.clusterName }}-deployment.yaml # Output file name in the root of the workspace
+        # Place the templated file into a 'content' subdirectory in the workspace
+        targetPath: content/${{ parameters.clusterName }}-deployment.yaml
         values:
           clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
           atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
@@ -69,6 +70,7 @@ spec:
           providerName: ${{ parameters.providerName }}
           regionName: ${{ parameters.regionName }}
           instanceSizeName: ${{ parameters.instanceSizeName }}
+          user: ${{ user }}
 
     - id: publish-new-config-repo
       name: Create New GitHub Repo for Cluster Config
@@ -76,18 +78,18 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: 'Configuration repository for Atlas cluster: ${{ parameters.clusterNameInAtlas }}'
-        # Creates a new repository like 'positive-mental-attitude/my-app-user-db-config'
-        repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterName }}-config'
-        # repoVisibility: 'private' # Or 'public'
+        repoUrl: 'https://github.com/positive-mental-attitude/${{ parameters.clusterName }}-config.git'
         commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}'
-        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # Commit the generated CRD to the root of this new repo
+        # sourcePath should point to the directory containing the file(s) to be committed to the new repo's root
+        sourcePath: content # This will commit the content of the 'content' directory (i.e., your CRD file)
+                            # to the root of the new repository.
 
     - id: create-pr-to-argocd-repo
       name: Create Pull Request to ArgoCD Watched Repo
       action: publish:github:pull-request
       input:
-        repoUrl: 'github.com?owner=positive-mental-attitude&repo=templates-repo' # Your main ArgoCD-watched repo
-        branchName: feat/add-cluster-${{ parameters.clusterName }} # Branch for the PR in templates-repo
+        repoUrl: 'https://github.com/positive-mental-attitude/templates-repo.git'
+        branchName: feat/add-cluster-${{ parameters.clusterName }}
         title: 'feat: Request to add Atlas cluster - ${{ parameters.clusterNameInAtlas }}'
         description: |
           Please review and merge this Pull Request to add the AtlasDeployment CRD for cluster:
@@ -97,22 +99,14 @@ spec:
           - Target Atlas Project (K8s Name): `${{ parameters.atlasProjectNameK8s }}`
 
           This CRD will be deployed to the `/atlas-crds/` directory.
-          The full configuration is also available in its dedicated repository: ${{ steps['publish-new-config-repo'].output.remoteUrl }}
-        # The content for the PR comes from the workspace.
-        # We need to ensure the file we want to PR is correctly placed for this action.
-        # The `publish:github:pull-request` action typically takes the content of the entire workspace
-        # or a specified sub-directory and proposes it as changes to the target repo.
-        # Here, we want to commit the single generated CRD file into a specific directory.
-        # For this, we need to ensure the sourcePath for the PR content is correct.
-        # The file `${{ parameters.clusterName }}.yaml` is already in the workspace root from the previous step.
-        # We'll define its target path in the PR.
-        sourcePath: ${{ parameters.clusterName }}-deployment.yaml # The generated CRD from 'fetch-and-template-crd' step
-        targetPath: atlas-crds/${{ parameters.clusterName }}.yaml # Where this file should go in the PR to templates-repo
-        # commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}' # Optional, action generates one
+          The full configuration is also available in its dedicated repository: https://github.com/positive-mental-attitude/${{ parameters.clusterName }}-config.git
+        # sourcePath for the PR should point to the specific file in the workspace
+        sourcePath: content/${{ parameters.clusterName }}-deployment.yaml
+        targetPath: atlas-crds/${{ parameters.clusterName }}-deployment.yaml # Where this file should go in the PR to templates-repo
 
   output:
     links:
       - title: View New Config Repository
-        url: ${{ steps['publish-new-config-repo'].output.remoteUrl }}
+        url: https://github.com/positive-mental-attitude/${{ parameters.clusterName }}-config
       - title: View Pull Request
         url: ${{ steps['create-pr-to-argocd-repo'].output.remoteUrl }}
