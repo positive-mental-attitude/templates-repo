@@ -52,14 +52,13 @@ spec:
           title: Instance Size
           type: string
           default: M10
-
   steps:
     - id: fetch-and-template
       name: Fetch Skeleton and Template CRD
       action: fetch:template
       input:
-        url: ../atlas-deployment-skeleton.yaml # Path to the skeleton file, relative to this template.yaml
-        targetPath: ${{ parameters.clusterName }}.yaml # Output file name in the root of the workspace
+        url: ../atlas-deployment-skeleton.yaml
+        targetPath: ${{ parameters.clusterName }}.yaml
         values:
           clusterName: ${{ parameters.clusterName }}
           atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
@@ -68,7 +67,7 @@ spec:
           providerName: ${{ parameters.providerName }}
           regionName: ${{ parameters.regionName }}
           instanceSizeName: ${{ parameters.instanceSizeName }}
-          user: ${{ user }} # Make sure user context is available if used in skeleton
+          user: ${{ user }}
 
     - id: publish-to-github
       name: Publish CRD to GitHub
@@ -76,10 +75,10 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: 'Publishing AtlasDeployment CRD for ${{ parameters.clusterName }}'
-        repoUrl: 'https://github.com/positive-mental-attitude/templates-repo.git'
+        repoUrl: 'github.com?owner=positive-mental-attitude&repo=templates-repo'
         branch: main
-        filePath: atlas-crds/${{ parameters.clusterName }}.yaml 
-        sourcePath: ${{ parameters.clusterName }}.yaml 
+        filePath: atlas-crds/${{ parameters.clusterName }}.yaml
+        sourcePath: ${{ parameters.clusterName }}.yaml
         commitMessage: 'feat: Add AtlasDeployment CRD for ${{ parameters.clusterName }} via Backstage'
         repoVisibility: 'public' 
   output:
