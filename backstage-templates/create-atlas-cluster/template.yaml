@@ -80,7 +80,7 @@ spec:
         repoUrl: 'github.com?owner=positive-mental-attitude&repo=${{ parameters.clusterNameInAtlas }}-config'
         # repoVisibility: 'private' # Or 'public'
         commitMessage: 'Initial commit: AtlasDeployment CRD for ${{ parameters.clusterNameInAtlas }}'
-        sourcePath: ${{ parameters.clusterNameInAtlas }}-deployment.yaml # Commit the generated CRD to the root of this new repo
+        # sourcePath: ${{ parameters.clusterNameInAtlas }}-deployment.yaml # Commit the generated CRD to the root of this new repo
 
     - id: create-pr-to-argocd-repo
       name: Create Pull Request to ArgoCD Watched Repo
