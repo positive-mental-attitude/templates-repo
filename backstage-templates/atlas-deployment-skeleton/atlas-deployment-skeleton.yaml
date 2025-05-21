@@ -18,7 +18,7 @@ spec:
       - zoneName: US-Zone
         regionConfigs:
           - electableSpecs:
-              intanceSize: ${{ values.instanceSizeName }}
+              instanceSize: ${{ values.instanceSizeName }}
               nodeCount: 3
             providerName: ${{ values.providerName }}
             regionName: ${{ values.regionName }}
