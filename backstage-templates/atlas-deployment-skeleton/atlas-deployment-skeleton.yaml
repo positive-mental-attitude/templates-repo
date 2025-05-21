@@ -8,7 +8,7 @@ metadata:
     environment: ${{ values.environment }}
     # owner: ${{ user.entity.metadata.name }}
 spec:
-  projectName: paulcheong-project-k8s 
+  projectRef: paulcheong-project-k8s 
   deploymentSpec:
     name: ${{ values.clusterNameInAtlas }}
     providerSettings:
