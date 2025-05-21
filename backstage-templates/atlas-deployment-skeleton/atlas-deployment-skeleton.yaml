@@ -12,7 +12,7 @@ spec:
     clusterType: REPLICASET
     tags:
       - key: "environment"
-        value: ${{ values.environment }}
+        value: "${{ values.environment }}"
     name: ${{ values.clusterNameInAtlas }}
     replicationSpecs:
       - zoneName: US-Zone
