@@ -44,7 +44,7 @@ spec:
           title: Cloud Provider
           type: string
           enum: [AWS, GCP, AZURE]
-          default: GCP
+          default: AWS
         regionName:
           title: Region
           type: string

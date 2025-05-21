@@ -3,10 +3,8 @@ apiVersion: atlas.mongodb.com/v1
 kind: AtlasDeployment
 metadata:
   name: ${{ values.clusterNameInAtlas }}-deployment
-  # namespace: mongodb-atlas-operator # Or make this a parameter
   labels:
     environment: ${{ values.environment }}
-    # owner: ${{ user.entity.metadata.name }}
 spec:
   projectRef: 
     name: paulcheong-project-k8s 
@@ -22,6 +20,6 @@ spec:
           - electableSpecs:
               intanceSize: ${{ values.instanceSizeName }}
               nodeCount: 3
-              providerName: ${{ values.providerName }}
-              regionName: ${{ values.regionName }}
-              priority: 7
+            providerName: ${{ values.providerName }}
+            regionName: ${{ values.regionName }}
+            priority: 7
