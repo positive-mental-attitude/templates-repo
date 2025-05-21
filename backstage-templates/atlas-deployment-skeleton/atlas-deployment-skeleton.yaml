@@ -11,9 +11,17 @@ spec:
   projectRef: 
     name: paulcheong-project-k8s 
   deploymentSpec:
+    clusterType: REPLICASET
+    tags:
+      - key: "environment"
+        value: ${{ values.environment }}
     name: ${{ values.clusterNameInAtlas }}
-    providerSettings:
-      instanceSizeName: ${{ values.instanceSizeName }} # e.g., M10, M20
-      providerName: ${{ values.providerName }} # e.g., AWS, GCP, AZURE
-      regionName: ${{ values.regionName }}
-  # Add other necessary spec fields like backup, BI connector, etc.
+    replicationSpecs:
+      - zoneName: US-Zone
+        regionConfigs:
+          - electableSpecs:
+              intanceSize: ${{ values.instanceSizeName }}
+              nodeCount: 3
+              providerName: ${{ values.providerName }}
+              regionName: ${{ values.regionName }}
+              priority: 7
