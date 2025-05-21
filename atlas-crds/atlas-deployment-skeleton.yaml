@@ -1,0 +1,25 @@
+# /backstage-templates/atlas-cluster/skeleton/atlas-deployment-skeleton.yaml
+apiVersion: atlas.mongodb.com/v1
+kind: AtlasDeployment
+metadata:
+  name: asdasd-deployment
+  labels:
+    environment: development
+spec:
+  projectRef: 
+    name: paulcheong-project-k8s 
+  deploymentSpec:
+    clusterType: REPLICASET
+    tags:
+      - key: "environment"
+        value: "development"
+    name: "asdasd""
+    replicationSpecs:
+      - zoneName: US-Zone
+        regionConfigs:
+          - electableSpecs:
+              intanceSize: M10
+              nodeCount: 3
+            providerName: AWS
+            regionName: US_EAST_1
+            priority: 7
