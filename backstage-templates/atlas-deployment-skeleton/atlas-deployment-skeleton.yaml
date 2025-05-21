@@ -2,13 +2,13 @@
 apiVersion: atlas.mongodb.com/v1
 kind: AtlasDeployment
 metadata:
-  name: ${{ values.clusterName }}
-  namespace: mongodb-atlas-operator # Or make this a parameter
+  name: my-atlas-cluster
+  # namespace: mongodb-atlas-operator # Or make this a parameter
   labels:
     environment: ${{ values.environment }}
     # owner: ${{ user.entity.metadata.name }}
 spec:
-  projectName: ${{ values.atlasProjectNameK8s }} # Assumes project already exists
+  projectName: paulcheong-project-k8s 
   deploymentSpec:
     name: ${{ values.clusterNameInAtlas }}
     providerSettings:

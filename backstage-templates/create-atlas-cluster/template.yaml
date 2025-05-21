@@ -11,23 +11,23 @@ spec:
   parameters:
     - title: Cluster Configuration
       required:
-        - clusterName # This will be used for K8s CR name and new repo suffix
-        - atlasProjectNameK8s
+        # - clusterName # This will be used for K8s CR name and new repo suffix
+        # - atlasProjectNameK8s
         - clusterNameInAtlas
         - environment
         - providerName
         - regionName
         - instanceSizeName
       properties:
-        clusterName:
-          title: Cluster Identifier (for K8s CR & New Repo)
-          type: string
-          description: Unique identifier for the cluster (e.g., my-app-user-db). Used for K8s CR name and new repo suffix.
-          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' # Example: lowercase alphanumeric with hyphens
-        atlasProjectNameK8s:
-          title: Target AtlasProject Kubernetes Name
-          type: string
-          description: The 'metadata.name' of the AtlasProject CR to deploy this cluster into (e.g., my-atlas-project-k8s).
+        # clusterName:
+        #   title: Cluster Identifier (for K8s CR & New Repo)
+        #   type: string
+        #   description: Unique identifier for the cluster (e.g., my-app-user-db). Used for K8s CR name and new repo suffix.
+        #   pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' # Example: lowercase alphanumeric with hyphens
+        # atlasProjectNameK8s:
+        #   title: Target AtlasProject Kubernetes Name
+        #   type: string
+        #   description: The 'metadata.name' of the AtlasProject CR to deploy this cluster into (e.g., my-atlas-project-k8s).
         clusterNameInAtlas:
           title: Cluster Name in Atlas UI
           type: string
@@ -62,8 +62,8 @@ spec:
         url: ../atlas-deployment-skeleton # Path to the skeleton file, relative to this template.yaml
         targetPath: atlas-crds # Output file name in the root of the workspace
         values:
-          clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
-          atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
+          # clusterName: ${{ parameters.clusterName }} # This will be the metadata.name of the AtlasDeployment CR
+          # atlasProjectNameK8s: ${{ parameters.atlasProjectNameK8s }}
           clusterNameInAtlas: ${{ parameters.clusterNameInAtlas }}
           environment: ${{ parameters.environment }}
           providerName: ${{ parameters.providerName }}
@@ -91,10 +91,8 @@ spec:
         title: 'feat: Request to add Atlas cluster - ${{ parameters.clusterNameInAtlas }}'
         description: |
           Please review and merge this Pull Request to add the AtlasDeployment CRD for cluster:
-          - Kubernetes CR Name: `${{ parameters.clusterName }}`
           - Atlas UI Name: `${{ parameters.clusterNameInAtlas }}`
           - Environment: `${{ parameters.environment }}`
-          - Target Atlas Project (K8s Name): `${{ parameters.atlasProjectNameK8s }}`
 
           This CRD will be deployed to the `/atlas-crds/` directory.
           The full configuration is also available in its dedicated repository: ${{ steps['publish-new-config-repo'].output.remoteUrl }}
