@@ -4,10 +4,10 @@ metadata:
   name: my-atlas-cluster
 spec:
   projectRef:
-    name: my-project
+    name: paulcheong-project-k8s
   deploymentSpec:
     clusterType: REPLICASET
-    name: "Test-cluster"
+    name: "Test"
     tags:
       - key: "environment"
         value: "production"
