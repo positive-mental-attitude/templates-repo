@@ -2,7 +2,7 @@
 apiVersion: atlas.mongodb.com/v1
 kind: AtlasDeployment
 metadata:
-  name: my-atlas-cluster
+  name: app-backstage-test
   # namespace: mongodb-atlas-operator # Or make this a parameter
   labels:
     environment: development
@@ -10,7 +10,7 @@ metadata:
 spec:
   projectName: paulcheong-project-k8s 
   deploymentSpec:
-    name: backstage
+    name: backstage-test
     providerSettings:
       instanceSizeName: M10 # e.g., M10, M20
       providerName: AWS # e.g., AWS, GCP, AZURE
