@@ -13,7 +13,7 @@ spec:
     tags:
       - key: "environment"
         value: "${{ values.environment }}"
-    name: "${{ values.clusterNameInAtlas }}""
+    name: "${{ values.clusterNameInAtlas }}"
     replicationSpecs:
       - zoneName: US-Zone
         regionConfigs:
