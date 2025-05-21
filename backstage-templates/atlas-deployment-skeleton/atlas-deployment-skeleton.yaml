@@ -2,7 +2,7 @@
 apiVersion: atlas.mongodb.com/v1
 kind: AtlasDeployment
 metadata:
-  name: ${{ values.clusterNameInAtlas }}
+  name: ${{ values.clusterNameInAtlas }}-deployment
   # namespace: mongodb-atlas-operator # Or make this a parameter
   labels:
     environment: ${{ values.environment }}
